@@ -20,6 +20,23 @@ var builder = WebApplication.CreateBuilder(args);
 string ConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 
+// Adding  CORS Service
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowPG.Web",
+//        options => options.AllowAnyOrigin());
+//       // builder => builder.WithOrigins("http://localhost:5002/"));
+
+//});
+builder.Services.AddCors(o => o.AddPolicy("MyPolicy", builder1 =>
+{
+    builder1.AllowAnyOrigin()
+           .AllowAnyMethod()
+           .AllowAnyHeader();
+}));
+
+
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -104,6 +121,9 @@ if (builder.Environment.IsDevelopment())
     });
 }
 
+// Using CORS on middleware pipeline
+app.UseCors("MyPolicy");
+
 // Custom middleware for API ExceptionHandling calls early in the middleware pipeline so to handel exceptions on later deligates
 // app.UseMiddleware(typeof(ExceptionHandlingMiddleware))
 // app.UseExceptionHandlingMiddleware(); //TODO : uncomment this code and implement it.
@@ -120,6 +140,8 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+
+//mapping b/w url and controller action method or bridge b/w HTTP request and controllers.
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
